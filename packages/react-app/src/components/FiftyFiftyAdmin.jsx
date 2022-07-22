@@ -3,6 +3,8 @@ import React, { useState, useEffect, useCallback } from "react";
 import { utils } from "ethers";
 import { useContractReader } from "eth-hooks";
 import SplitTable from "./SplitTable";
+import { Octokit } from "@octokit/core";
+
 export default function FiftyFiftyAdmin({ tx, readContracts, writeContracts, address }) {
   const location = window.location.pathname;
   const owner = useContractReader(readContracts, "YourContract", "owner");
@@ -17,6 +19,10 @@ export default function FiftyFiftyAdmin({ tx, readContracts, writeContracts, add
     setProjects(data.records);
     console.log(data.records);
   }, [deleted]);
+
+  const octokit = new Octokit({
+    auth: "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",
+  });
 
   const homeSection = (
     <div
@@ -34,13 +40,35 @@ export default function FiftyFiftyAdmin({ tx, readContracts, writeContracts, add
       </h1>
       <h3>Admin Panel</h3>
       <h3>
-        <span style={{ marginRight: "2px" }}>
-          <img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" height="32px" />
-          {isOwner ? "You are the Admin" : "You are not the Admin"}
-        </span>
+        <span style={{ marginRight: "2px" }}>{isOwner ? "You are the Admin" : "You are not the Admin"}</span>
       </h3>
     </div>
   );
+  const notifyGithub = useCallback(async (admittedURL, splitGithubs) => {
+    splitGithubs.forEach(async githubURL => {
+      const secondHalf = githubURL.slice(githubURL.indexOf("github.com") + 11);
+      const slashIndex = secondHalf.indexOf("/");
+      if (slashIndex != -1) {
+        const owner = secondHalf.slice(0, slashIndex);
+        const repo = secondHalf.slice(slashIndex + 1);
+        console.log(owner, repo);
+        try {
+          await octokit.request(`POST /repos/${owner}/${repo}/issues`, {
+            owner: owner,
+            repo: repo,
+            title: "You've been added to a split in 0xPARC's 50-50!",
+            body: `${admittedURL} has added you to a split in 0xPARC's 50-50 program. This means that everytime someone donates to them, some percentage will be sent to your repo.\n
+            \n
+            You can claim these funds at https://5050split.xyz/${owner}/${repo}\n
+            \n
+            More information available at https://5050split.xyz!`,
+          });
+        } catch (e) {
+          console.log(e);
+        }
+      }
+    });
+  }, []);
   const approve = useCallback(
     (item, approveOrDeny) => {
       const fields = item.fields;
@@ -105,6 +133,15 @@ export default function FiftyFiftyAdmin({ tx, readContracts, writeContracts, add
                           >
                             Approve
                           </Button>,
+                          // <Button
+                          //   onClick={() => {
+                          //     notifyGithub(item.fields.GithubURL, splitGithubs);
+                          //     approve(item, true);
+                          //   }}
+                          //   type="primary"
+                          // >
+                          //   {"Approve & notify"}
+                          // </Button>,
                           <Button
                             danger
                             onClick={() => {
@@ -117,7 +154,7 @@ export default function FiftyFiftyAdmin({ tx, readContracts, writeContracts, add
                       : []
                   }
                 >
-                  <div style={{ display: "flex", flexDirection: "column" }}>
+                  <div style={{ display: "flex", flexDirection: "column", textAlign: "center" }}>
                     <h1>
                       <a href={item.fields.GithubURL} style={{ color: "green" }}>
                         {item.fields.GithubURL}

@@ -35,7 +35,7 @@ const columns = [
               color = "purple";
               break;
             case "Individual":
-              color = "yellow";
+              color = "orange";
               break;
             default:
               color = "volcano";
@@ -78,12 +78,14 @@ export default function SplitTable({
       percent: 50,
       tags: ["Team"],
     });
-    tableData.push({
-      key: "community pool",
-      name: { id: communityPoolAddress, url: `https://etherscan.io/address/${communityPoolAddress}` },
-      percent: communityPoolPercentage / 1e4,
-      tags: ["Community pool"],
-    });
+    if (communityPoolPercentage > 0) {
+      tableData.push({
+        key: "community pool",
+        name: { id: communityPoolAddress, url: `https://etherscan.io/address/${communityPoolAddress}` },
+        percent: communityPoolPercentage / 1e4,
+        tags: ["Community pool"],
+      });
+    }
     splitGithubURLs.forEach((githubURL, index) => {
       let secondHalf = githubURL.slice(githubURL.indexOf("github.com") + 11);
       tableData.push({
