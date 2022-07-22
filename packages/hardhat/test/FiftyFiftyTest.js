@@ -27,7 +27,12 @@ describe("FiftyFifty testing", function () {
 
     it("Should deploy YourContract", async function () {
       const YourContract = await ethers.getContractFactory("YourContract");
-      myContract = await YourContract.deploy(500000, 5000, splitMain.address);
+      myContract = await YourContract.deploy(
+        500000,
+        5000,
+        splitMain.address,
+        "https://github.com/0xPARC"
+      );
     });
 
     describe("Adding two projects", function () {
