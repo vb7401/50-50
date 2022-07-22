@@ -15,6 +15,9 @@ contract YourContract is Ownable {
     address payable receiveMoneyAddress;
     address payable splitProxyAddress;
     bool splitAdded;
+
+    address[] splitAddresses;
+    uint32[] percentAllocations;
   }
   mapping(string => Project) public githubURLToProject;
   uint32 percentKeep;
@@ -99,6 +102,9 @@ contract YourContract is Ownable {
       }
     }
 
+    project.splitAddresses = splitAddresses;
+    project.percentAllocations = newPercentAllocations;
+
     // create or update split proxy for this GitHub
     if (!project.splitAdded) {
       project.splitProxyAddress = payable(splitMain.createSplit(
@@ -166,6 +172,8 @@ contract YourContract is Ownable {
       placeholderPercentage, 
       percentDistributorFee
     );
+    project.splitAddresses = placeholderAddresses;
+    project.percentAllocations = placeholderPercentage;
     project.splitAdded = true;
   }
 
@@ -180,6 +188,10 @@ contract YourContract is Ownable {
   function getSplitAddress(string memory githubURL) external view returns (address payable) {
     Project storage project = githubURLToProject[githubURL];
     return project.splitProxyAddress;
+  }
+
+  function getProject(string memory githubURL) external view returns (Project memory) {
+    return githubURLToProject[githubURL];
   }
   
   // to support receiving ETH by default

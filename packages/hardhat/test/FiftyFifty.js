@@ -47,6 +47,14 @@ describe("FiftyFifty testing", function () {
           "0x7162C2F74a1b968aa33E3DCFd15366264E9eC53c"
         );
 
+        const projectAllocation = (
+          await myContract.getProject("https://github.com/dizkus/heyanon")
+        ).percentAllocations;
+
+        expect(projectAllocation).to.have.members([
+          150000, 200000, 100000, 500000, 50000,
+        ]);
+
         cabalSplitAddress = await myContract.getSplitAddress(
           "https://github.com/0xPARC/cabal"
         );
@@ -61,6 +69,12 @@ describe("FiftyFifty testing", function () {
           0,
           "0x0000000000000000000000000000000000000000"
         );
+
+        const projectAllocation = (
+          await myContract.getProject("https://github.com/0xPARC/cabal")
+        ).percentAllocations;
+
+        expect(projectAllocation).to.have.members([500000, 500000]);
 
         const newCabalSplitAdress = await myContract.getSplitAddress(
           "https://github.com/0xPARC/cabal"
