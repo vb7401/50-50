@@ -11,12 +11,16 @@ contract YourContract is Ownable {
    * CONTRACT STATE
    */
   struct Project {
+    bool splitAdded;
+
     string githubURL;
     address payable receiveMoneyAddress;
     address payable splitProxyAddress;
-    bool splitAdded;
 
-    address[] splitAddresses;
+    uint32 communityPoolPercentage;
+    address payable communityPoolAddress;
+
+    string[] splitGithubURLs;
     uint32[] percentAllocations;
   }
   mapping(string => Project) public githubURLToProject;
@@ -52,6 +56,10 @@ contract YourContract is Ownable {
     Project storage project = githubURLToProject[githubURL];
     project.githubURL = githubURL;
     project.receiveMoneyAddress = receiveMoneyAddress;
+    project.splitGithubURLs = splitGithubURLs;
+    project.percentAllocations = percentAllocations;
+    project.communityPoolPercentage = communityPoolPercentage;
+    project.communityPoolAddress = communityPoolAddress;
 
     // stores addresses of GitHub repos, address of team, and address of community pool
     address[] memory splitAddresses;
@@ -81,7 +89,7 @@ contract YourContract is Ownable {
     }
 
     // add self + kept percentage
-    splitAddresses[splitGithubURLs.length] = project.receiveMoneyAddress;
+    splitAddresses[splitGithubURLs.length] = receiveMoneyAddress;
     newPercentAllocations[splitGithubURLs.length] = percentKeep;
 
     // assert sum of percentAllocations is PERCENTAGE_SCALE
@@ -101,9 +109,6 @@ contract YourContract is Ownable {
         }
       }
     }
-
-    project.splitAddresses = splitAddresses;
-    project.percentAllocations = newPercentAllocations;
 
     // create or update split proxy for this GitHub
     if (!project.splitAdded) {
@@ -172,8 +177,6 @@ contract YourContract is Ownable {
       placeholderPercentage, 
       percentDistributorFee
     );
-    project.splitAddresses = placeholderAddresses;
-    project.percentAllocations = placeholderPercentage;
     project.splitAdded = true;
   }
 
@@ -185,11 +188,6 @@ contract YourContract is Ownable {
   /**
    * CONTRACT GETTERS
    */
-  function getSplitAddress(string memory githubURL) external view returns (address payable) {
-    Project storage project = githubURLToProject[githubURL];
-    return project.splitProxyAddress;
-  }
-
   function getProject(string memory githubURL) external view returns (Project memory) {
     return githubURLToProject[githubURL];
   }

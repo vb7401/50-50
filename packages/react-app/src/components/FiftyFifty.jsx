@@ -7,21 +7,52 @@ export default function FiftyFifty({ tx, readContracts, writeContracts, address 
   const location = window.location.pathname;
   const githubURL = `https://github.com${location}`;
 
-  const splitAddress = useContractReader(readContracts, "YourContract", "getSplitAddress", [githubURL]);
-  const exists = splitAddress !== "0x0000000000000000000000000000000000000000";
-  const owner = useContractReader(readContracts, "YourContract", "_owner");
+  const projectInfo = useContractReader(readContracts, "YourContract", "getProject", [githubURL]);
+  console.log(projectInfo);
+  const splitAddress = projectInfo && projectInfo.splitProxyAddress;
+  const splitGithubURLs = projectInfo && projectInfo.splitGithubURLs;
+  const percentAllocations = projectInfo && projectInfo.percentAllocations;
+  const receiveMoneyAddress = projectInfo && projectInfo.receiveMoneyAddress;
+  const communityPoolAddress = projectInfo && projectInfo.communityPoolAddress;
+  const communityPoolPercentage = projectInfo && projectInfo.communityPoolPercentage;
+
+  const isInSystem = receiveMoneyAddress && receiveMoneyAddress !== "0x0000000000000000000000000000000000000000";
+
+  const owner = useContractReader(readContracts, "YourContract", "owner");
   const splitAddressSection = !splitAddress ? (
     <></>
-  ) : exists ? (
-    <h3>
-      <Button
-        kind="primary"
-        onClick={() => {
-          window.open(`https://app.0xsplits.xyz/accounts/${splitAddress}`, "_blank");
-        }}
-        target="_blank"
-      >{`Your split info is here`}</Button>
-    </h3>
+  ) : isInSystem ? (
+    <>
+      <h4>
+        {`Team's 50% goes to `}
+        <a href={`https://etherscan.io/address/${receiveMoneyAddress}`} target="_blank">
+          {receiveMoneyAddress}
+        </a>
+      </h4>
+      <h4>
+        {`Community pool of ${communityPoolPercentage / 1e4}% goes to `}
+        <a href={`https://etherscan.io/address/${communityPoolAddress}`} target="_blank">
+          {communityPoolAddress}
+        </a>
+      </h4>
+      {splitGithubURLs.map((githubURL, index) => (
+        <h4>
+          {`${percentAllocations[index] / 1e4}% goes to `}
+          <a href={githubURL} target="_blank">
+            {githubURL}
+          </a>
+        </h4>
+      ))}
+      <h4>
+        <Button
+          kind="primary"
+          onClick={() => {
+            window.open(`https://app.0xsplits.xyz/accounts/${splitAddress}`, "_blank");
+          }}
+          target="_blank"
+        >{`Donate money here!`}</Button>
+      </h4>
+    </>
   ) : (
     <h4>Submit an Application to join!</h4>
   );
@@ -30,7 +61,7 @@ export default function FiftyFifty({ tx, readContracts, writeContracts, address 
     <div
       style={{
         padding: 16,
-        width: 400,
+        width: 600,
         margin: "auto",
         marginTop: 64,
         textAlign: "center",
@@ -38,38 +69,38 @@ export default function FiftyFifty({ tx, readContracts, writeContracts, address 
     >
       <img src="https://0xparc.org/logo_with_text.fd13ff62.svg" height="200px" />
       <h1>
-        <i>FiftyFifty</i>
+        <i>50-50</i>
       </h1>
-      <h3>
+      <h1>
         <span style={{ marginRight: "2px" }}>
           <img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" height="32px" />
         </span>
         <a href={githubURL} target="_blank">
           {githubURL}
         </a>
-      </h3>
+      </h1>
       {splitAddressSection}
     </div>
   );
   const airtableForm = (
     <iframe
+      title="submit application"
       class="airtable-embed"
       src={`https://airtable.com/embed/shrWAzxamKToY2Dmv?backgroundColor=purple&prefill_GithubURL=${encodeURI(
         githubURL,
       )}&prefill_ReceiveMoneyAddress=${encodeURI(address || "")}`}
-      frameborder="0"
       onmousewheel=""
       width="100%"
       height="100%"
-      style={{ background: "transparent", border: "1px solid #ccc" }}
+      style={{ background: "white", border: "0px", position: "fixed" }}
     ></iframe>
   );
-  return exists ? (
+  return isInSystem ? (
     homeSection
   ) : (
-    <div style={{ display: "flex", flexDirection: "row", width: "100vw", height: "100vh" }}>
-      <div style={{ width: "50vw", height: "100vh" }}>{homeSection}</div>
-      <div style={{ width: "50vw", height: "100vh" }}>{airtableForm}</div>
+    <div style={{ display: "flex", flexDirection: "column", width: "100vw" }}>
+      <div style={{ width: "100vw", height: "100%" }}>{homeSection}</div>
+      <div style={{ width: "100vw" }}>{airtableForm}</div>
     </div>
   );
 }

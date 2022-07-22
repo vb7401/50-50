@@ -51,13 +51,11 @@ describe("FiftyFifty testing", function () {
           await myContract.getProject("https://github.com/dizkus/heyanon")
         ).percentAllocations;
 
-        expect(projectAllocation).to.have.members([
-          150000, 200000, 100000, 500000, 50000,
-        ]);
+        expect(projectAllocation).to.have.members([150000, 200000, 100000]);
 
-        cabalSplitAddress = await myContract.getSplitAddress(
-          "https://github.com/0xPARC/cabal"
-        );
+        cabalSplitAddress = (
+          await myContract.getProject("https://github.com/0xPARC/cabal")
+        ).splitAddress;
       });
 
       it("add second project without a pool, update split", async function () {
@@ -74,11 +72,11 @@ describe("FiftyFifty testing", function () {
           await myContract.getProject("https://github.com/0xPARC/cabal")
         ).percentAllocations;
 
-        expect(projectAllocation).to.have.members([500000, 500000]);
+        expect(projectAllocation).to.have.members([500000]);
 
-        const newCabalSplitAdress = await myContract.getSplitAddress(
-          "https://github.com/0xPARC/cabal"
-        );
+        const newCabalSplitAdress = (
+          await myContract.getProject("https://github.com/0xPARC/cabal")
+        ).splitAddress;
 
         expect(newCabalSplitAdress).to.equal(cabalSplitAddress);
       });
