@@ -7,6 +7,7 @@ export default function FiftyFifty({ tx, readContracts, writeContracts, address 
   const location = window.location.pathname;
   const githubURL = `https://github.com${location}`;
 
+<<<<<<< HEAD
   const projectInfo = useContractReader(readContracts, "YourContract", "getProject", [githubURL]);
   console.log(projectInfo);
   const splitAddress = projectInfo && projectInfo.splitProxyAddress;
@@ -18,6 +19,10 @@ export default function FiftyFifty({ tx, readContracts, writeContracts, address 
 
   const isInSystem = receiveMoneyAddress && receiveMoneyAddress !== "0x0000000000000000000000000000000000000000";
 
+=======
+  const splitAddress = useContractReader(readContracts, "YourContract", "getSplitAddress", [githubURL]);
+  const exists = splitAddress !== "0x0000000000000000000000000000000000000000";
+>>>>>>> 90a49c2acb76d7fab015cc3a469640bfe90551bd
   const owner = useContractReader(readContracts, "YourContract", "owner");
   const splitAddressSection = !splitAddress ? (
     <></>

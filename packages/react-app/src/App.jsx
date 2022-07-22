@@ -349,7 +349,7 @@ function App(props) {
         </div>
       </Route>
       <Route path="/admin">
-        <FiftyFiftyAdmin />
+        <FiftyFiftyAdmin tx={tx} writeContracts={writeContracts} readContracts={readContracts} address={address} />
       </Route>
       <Route default>
         <FiftyFifty tx={tx} writeContracts={writeContracts} readContracts={readContracts} address={address} />
