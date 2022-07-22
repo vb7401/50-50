@@ -36,7 +36,7 @@ export default function FiftyFiftyAdmin({ tx, readContracts, writeContracts, add
     >
       <img src="https://0xparc.org/logo_with_text.fd13ff62.svg" height="200px" />
       <h1>
-        <i>FiftyFifty</i>
+        <i>50-50</i>
       </h1>
       <h3>Admin Panel</h3>
       <h3>

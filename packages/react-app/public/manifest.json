@@ -1,10 +1,10 @@
 {
-  "short_name": "🏗 Scaffold-Eth App",
+  "short_name": "50-50",
   "start_url": ".",
-  "name": "🏗 Scaffold-Eth App",
+  "name": "0xPARC 50-50",
   "icons": [
     {
-      "src": "favicon.ico",
+      "src": "0xPARC.ico",
       "sizes": "64x64 32x32 24x24 16x16",
       "type": "image/x-icon"
     },
