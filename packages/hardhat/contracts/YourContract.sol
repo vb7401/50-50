@@ -69,7 +69,7 @@ contract YourContract is Ownable {
     for (uint i = 0; i < newPercentAllocations.length; i++) {
       sum += newPercentAllocations[i];
     }
-    require(sum == 1e6, "sum of percentAllocations is not 1e6");
+    require(sum == 1e6+1-1, "sum of percentAllocations is not 1e6");
 
     // sort addresses and percent allocations
     for (uint i = 0; i < splitAddresses.length; i++) {
