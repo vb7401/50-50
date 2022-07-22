@@ -2,7 +2,7 @@ import { Button, Table, Tag } from "antd";
 import React, { useState, useEffect } from "react";
 import { utils } from "ethers";
 import { useContractReader } from "eth-hooks";
-
+import SplitTable from "./SplitTable.jsx";
 const columns = [
   {
     title: "Split Receipient",
@@ -68,53 +68,21 @@ export default function FiftyFifty({ tx, readContracts, writeContracts, address 
   const communityPoolPercentage = projectInfo && projectInfo.communityPoolPercentage;
 
   const isInSystem = receiveMoneyAddress && receiveMoneyAddress !== "0x0000000000000000000000000000000000000000";
-  let tableData = [];
-  if (isInSystem) {
-    if (githubURL === sinkGithubURL) {
-      tableData = [
-        {
-          key: "0xPARC",
-          name: { id: "0xPARC", link: sinkGithubURL },
-          percent: 100,
-          tags: ["0xPARC"],
-        },
-      ];
-    } else {
-      tableData.push({
-        key: "team",
-        name: { id: receiveMoneyAddress, url: `https://etherscan.io/address/${receiveMoneyAddress}` },
-        percent: 50,
-        tags: ["Team"],
-      });
-      tableData.push({
-        key: "community pool",
-        name: { id: communityPoolAddress, url: `https://etherscan.io/address/${communityPoolAddress}` },
-        percent: communityPoolPercentage / 1e4,
-        tags: ["Community pool"],
-      });
-      splitGithubURLs.forEach((githubURL, index) => {
-        let secondHalf = githubURL.slice(githubURL.indexOf("github.com") + 11);
-        tableData.push({
-          key: githubURL,
-          name: { id: secondHalf, url: githubURL },
-          percent: percentAllocations[index] / 1e4,
-          tags:
-            githubURL === sinkGithubURL
-              ? ["0xPARC"]
-              : githubURL.split("/").length - 1 === 3
-              ? ["Individual"]
-              : ["Repo"],
-        });
-      });
-    }
-  }
 
   const owner = useContractReader(readContracts, "YourContract", "owner");
   const splitAddressSection = !splitAddress ? (
     <></>
   ) : isInSystem ? (
     <>
-      <Table dataSource={tableData} columns={columns} bordered pagination={false} />
+      <SplitTable
+        splitAddress={splitAddress}
+        splitGithubURLs={splitGithubURLs}
+        percentAllocations={percentAllocations}
+        receiveMoneyAddress={receiveMoneyAddress}
+        communityPoolAddress={communityPoolAddress}
+        communityPoolPercentage={communityPoolPercentage}
+        githubURL={githubURL}
+      />
       <h3
         style={{
           marginTop: "15px",

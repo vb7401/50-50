@@ -2,7 +2,7 @@ import { Button, Card, DatePicker, Divider, Input, Progress, Slider, Spin, Switc
 import React, { useState, useEffect, useCallback } from "react";
 import { utils } from "ethers";
 import { useContractReader } from "eth-hooks";
-
+import SplitTable from "./SplitTable";
 export default function FiftyFiftyAdmin({ tx, readContracts, writeContracts, address }) {
   const location = window.location.pathname;
   const owner = useContractReader(readContracts, "YourContract", "owner");
@@ -80,13 +80,14 @@ export default function FiftyFiftyAdmin({ tx, readContracts, writeContracts, add
     [tx, writeContracts],
   );
   return (
-    <div style={{ display: "flex", flexDirection: "row", width: "100vw", height: "100vh" }}>
-      <div style={{ width: "50vw", height: "100vh" }}>{homeSection}</div>
-      <div style={{ width: "50vw", height: "100vh" }}>
-        {projects.length == 0 && <h3>No open applications!</h3>}
+    <div style={{ display: "flex", flexDirection: "column", width: "600px", margin: "auto" }}>
+      <div style={{ width: "100%" }}>{homeSection}</div>
+      <div style={{ width: "100%" }}>
+        {projects.length == 0 && <h3 style={{ textAlign: "center", color: "red" }}>No open applications!</h3>}
         {projects.length > 0 && (
           <List
             dataSource={projects}
+            itemLayout="vertical"
             renderItem={item => {
               console.log(item);
               const percents = item.fields.PercentAllocations.split("\n");
@@ -100,10 +101,12 @@ export default function FiftyFiftyAdmin({ tx, readContracts, writeContracts, add
                             onClick={() => {
                               approve(item, true);
                             }}
+                            type="primary"
                           >
                             Approve
                           </Button>,
                           <Button
+                            danger
                             onClick={() => {
                               approve(item, false);
                             }}
@@ -114,12 +117,24 @@ export default function FiftyFiftyAdmin({ tx, readContracts, writeContracts, add
                       : []
                   }
                 >
-                  <List.Item.Meta
-                    title={item.fields.GithubURL}
-                    description={`Address: ${item.fields.ReceiveMoneyAddress}`}
-                  />
-                  {percents.join(", ")} <br />
-                  {splitGithubs.join(", ")}
+                  <div style={{ display: "flex", flexDirection: "column" }}>
+                    <h1>
+                      <a href={item.fields.GithubURL} style={{ color: "green" }}>
+                        {item.fields.GithubURL}
+                      </a>
+                    </h1>
+                    <SplitTable
+                      splitAddress={undefined}
+                      splitGithubURLs={item.fields.SplitGithubURLs.split("\n")}
+                      percentAllocations={item.fields.PercentAllocations.split("\n").map(i =>
+                        Math.round(parseFloat(i) * 1e4),
+                      )}
+                      receiveMoneyAddress={item.fields.ReceiveMoneyAddress}
+                      communityPoolAddress={item.fields.CommunityPoolAddress || item.fields.ReceiveMoneyAddress}
+                      communityPoolPercentage={Math.round(parseFloat(item.fields.CommunityPoolPercentage) * 1e6)}
+                      githubURL={item.fields.GithubURL}
+                    />
+                  </div>
                 </List.Item>
               );
             }}
