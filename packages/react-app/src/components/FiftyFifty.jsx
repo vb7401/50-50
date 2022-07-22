@@ -9,7 +9,7 @@ export default function FiftyFifty({ tx, readContracts, writeContracts, address 
 
   const splitAddress = useContractReader(readContracts, "YourContract", "getSplitAddress", [githubURL]);
   const exists = splitAddress !== "0x0000000000000000000000000000000000000000";
-  const owner = useContractReader(readContracts, "YourContract", "_owner");
+  const owner = useContractReader(readContracts, "YourContract", "owner");
   const splitAddressSection = !splitAddress ? (
     <></>
   ) : exists ? (

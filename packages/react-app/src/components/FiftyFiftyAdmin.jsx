@@ -1,13 +1,23 @@
-import { Button, Card, DatePicker, Divider, Input, Progress, Slider, Spin, Switch } from "antd";
-import React, { useState, useEffect } from "react";
+import { Button, Card, DatePicker, Divider, Input, Progress, Slider, Spin, Switch, List } from "antd";
+import React, { useState, useEffect, useCallback } from "react";
 import { utils } from "ethers";
 import { useContractReader } from "eth-hooks";
 
-export default function FiftyFifty({ tx, readContracts, writeContracts, address }) {
+export default function FiftyFiftyAdmin({ tx, readContracts, writeContracts, address }) {
   const location = window.location.pathname;
-  const owner = useContractReader(readContracts, "YourContract", "_owner");
-
+  const owner = useContractReader(readContracts, "YourContract", "owner");
+  console.log(`Owner: ${owner}`);
   const isOwner = address === owner;
+  const [projects, setProjects] = useState([]);
+  const [deleted, setDeleted] = useState(0);
+  useEffect(async () => {
+    const data = await fetch("https://api.airtable.com/v0/appeFA58ZaGbZ31W2/Projects?api_key=keyiEf8fQaP7oZJEC").then(
+      resp => resp.json(),
+    );
+    setProjects(data.records);
+    console.log(data.records);
+  }, [deleted]);
+
   const homeSection = (
     <div
       style={{
@@ -31,11 +41,72 @@ export default function FiftyFifty({ tx, readContracts, writeContracts, address 
       </h3>
     </div>
   );
-
+  const approve = useCallback(
+    item => {
+      const fields = item.fields;
+      console.log(writeContracts);
+      console.log(fields.PercentAllocations.split("\n").map(i => parseInt(i)));
+      const result = tx(
+        writeContracts.YourContract.addProjectToSystem(
+          fields.GithubURL,
+          fields.ReceiveMoneyAddress,
+          fields.SplitGithubURLs.split("\n"),
+          fields.PercentAllocations.split("\n").map(i => parseInt(i) * 1e4),
+          fields.CommunityPoolPercentage,
+          fields.CommunityPoolAddress || fields.ReceiveMoneyAddress,
+        ),
+        update => {
+          console.log("📡 Transaction Update:", update);
+          if (update && (update.status === "confirmed" || update.status === 1)) {
+            console.log(" 🍾 Transaction " + update.hash + " finished!");
+            fetch(`https://api.airtable.com/v0/appeFA58ZaGbZ31W2/Projects/${item.id}?api_key=keyiEf8fQaP7oZJEC`, {
+              method: "DELETE",
+            }).then(() => {
+              setDeleted(d => d + 1);
+            });
+          }
+        },
+      );
+    },
+    [tx, writeContracts],
+  );
   return (
     <div style={{ display: "flex", flexDirection: "row", width: "100vw", height: "100vh" }}>
       <div style={{ width: "50vw", height: "100vh" }}>{homeSection}</div>
-      <div style={{ width: "50vw", height: "100vh" }}></div>
+      <div style={{ width: "50vw", height: "100vh" }}>
+        <List
+          dataSource={projects}
+          renderItem={item => {
+            console.log(item);
+            const percents = item.fields.PercentAllocations.split("\n");
+            const splitGithubs = item.fields.SplitGithubURLs.split("\n");
+            return (
+              <List.Item
+                actions={
+                  isOwner
+                    ? [
+                        <Button
+                          onClick={() => {
+                            approve(item);
+                          }}
+                        >
+                          Approve
+                        </Button>,
+                      ]
+                    : []
+                }
+              >
+                <List.Item.Meta
+                  title={item.fields.GithubURL}
+                  description={`Address: ${item.fields.ReceiveMoneyAddress}`}
+                />
+                {percents.join(", ")} <br />
+                {splitGithubs.join(", ")}
+              </List.Item>
+            );
+          }}
+        />
+      </div>
     </div>
   );
 }
