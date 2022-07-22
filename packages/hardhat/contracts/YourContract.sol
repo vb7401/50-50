@@ -26,6 +26,7 @@ contract YourContract is Ownable {
   mapping(string => Project) public githubURLToProject;
   uint32 percentKeep;
   uint32 percentDistributorFee;
+  string sinkGithubURL;
 
   ISplitMain splitMain;
 
@@ -34,10 +35,22 @@ contract YourContract is Ownable {
   uint32 public constant PERCENTAGE_SCALE = 1e6;
 
   // inputted percents must use PERCENTAGE_SCALE
-  constructor(uint32 _percentKeep, uint32 _percentDistributorFee, address _splitMainAddress) {
+  constructor(
+    uint32 _percentKeep, 
+    uint32 _percentDistributorFee, 
+    address _splitMainAddress,
+    string memory _sinkGithubURL
+  ) {
     percentKeep = _percentKeep;
     percentDistributorFee = _percentDistributorFee;
     splitMain = ISplitMain(_splitMainAddress);
+    sinkGithubURL = _sinkGithubURL;
+
+    Project storage sinkProject = githubURLToProject[sinkGithubURL];
+    sinkProject.splitAdded = true;
+    sinkProject.githubURL = sinkGithubURL;
+    sinkProject.receiveMoneyAddress = payable(msg.sender);
+    sinkProject.splitProxyAddress = payable(msg.sender);
   }
 
   /**
@@ -185,11 +198,21 @@ contract YourContract is Ownable {
     percentDistributorFee = _newPercentDistributorFee;
   }
 
+  // transfer ownership of contract and change address of sink URL
+  function transferOwnership(address newOwner) public override onlyOwner {
+    super.transferOwnership(newOwner);
+    githubURLToProject[sinkGithubURL].splitProxyAddress = payable(newOwner);
+  }
+
   /**
    * CONTRACT GETTERS
    */
   function getProject(string memory githubURL) external view returns (Project memory) {
     return githubURLToProject[githubURL];
+  }
+
+  function getSinkGithubURL() external view returns (string memory) {
+    return sinkGithubURL;
   }
   
   // to support receiving ETH by default
