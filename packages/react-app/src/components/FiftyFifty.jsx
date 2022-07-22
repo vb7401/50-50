@@ -54,7 +54,7 @@ export default function FiftyFifty({ tx, readContracts, writeContracts, address 
       </h4>
     </>
   ) : (
-    <h4>Submit an Application to join!</h4>
+    <></>
   );
   const isOwner = address === owner;
   const homeSection = (
@@ -72,10 +72,11 @@ export default function FiftyFifty({ tx, readContracts, writeContracts, address 
         <i>50-50</i>
       </h1>
       <h1>
-        <span style={{ marginRight: "2px" }}>
+        <span style={{ marginRight: "4px" }}>
           <img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" height="32px" />
         </span>
-        <a href={githubURL} target="_blank">
+
+        <a href={githubURL} target="_blank" style={{ color: isInSystem ? "green" : "red" }}>
           {githubURL}
         </a>
       </h1>
@@ -88,19 +89,20 @@ export default function FiftyFifty({ tx, readContracts, writeContracts, address 
       class="airtable-embed"
       src={`https://airtable.com/embed/shrWAzxamKToY2Dmv?backgroundColor=purple&prefill_GithubURL=${encodeURI(
         githubURL,
-      )}&prefill_ReceiveMoneyAddress=${encodeURI(address || "")}`}
+      )}&prefill_ReceiveMoneyAddress=${encodeURI(address || "")}&prefill_SplitGithubURLs=${encodeURI(
+        "https://github.com/ORG1HERE\nhttps://github.com/ORG2HERE",
+      )}&prefill_PercentAllocations=${encodeURI("30\n20")}&prefill_CommunityPoolPercentage=0`}
       onmousewheel=""
       width="100%"
-      height="100%"
-      style={{ background: "white", border: "0px", position: "fixed" }}
+      style={{ background: "white", border: "0px", position: "fixed", height: "calc(100vh - 400px)" }}
     ></iframe>
   );
   return isInSystem ? (
     homeSection
   ) : (
-    <div style={{ display: "flex", flexDirection: "column", width: "100vw" }}>
-      <div style={{ width: "100vw", height: "100%" }}>{homeSection}</div>
-      <div style={{ width: "100vw" }}>{airtableForm}</div>
+    <div style={{ display: "flex", flexDirection: "column", width: "100vw", height: "100vh" }}>
+      <div style={{ width: "100vw", height: "400px" }}>{homeSection}</div>
+      <div style={{ width: "100vw", height: "calc(100vh - 400px)" }}>{airtableForm}</div>
     </div>
   );
 }
