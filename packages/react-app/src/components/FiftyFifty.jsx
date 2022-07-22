@@ -7,7 +7,7 @@ export default function FiftyFifty({ tx, readContracts, writeContracts, address 
   const location = window.location.pathname;
   const githubURL = `https://github.com${location}`;
 
-  const splitAddress = useContractReader(readContracts, "YourContract", "getDonationAddress", [githubURL]);
+  const splitAddress = useContractReader(readContracts, "YourContract", "getSplitAddress", [githubURL]);
   const exists = splitAddress !== "0x0000000000000000000000000000000000000000";
   const owner = useContractReader(readContracts, "YourContract", "_owner");
   const splitAddressSection = !splitAddress ? (
