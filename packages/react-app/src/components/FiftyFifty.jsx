@@ -74,6 +74,17 @@ export default function FiftyFifty({ tx, readContracts, writeContracts, address 
     <></>
   ) : isInSystem ? (
     <>
+      <h3>
+        <span style={{ marginRight: "4px" }}>
+          <img
+            src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/Ethereum-icon-purple.svg/1024px-Ethereum-icon-purple.svg.png?20200227011040"
+            height="32px"
+          />
+        </span>
+        <a href={`https://app.0xsplits.xyz/accounts/${splitAddress}`} target="_blank">
+          Donation Address: {splitAddress}
+        </a>
+      </h3>
       <SplitTable
         splitAddress={splitAddress}
         splitGithubURLs={splitGithubURLs}
@@ -89,12 +100,13 @@ export default function FiftyFifty({ tx, readContracts, writeContracts, address 
         }}
       >
         <Button
-          kind="primary"
+          type="primary"
+          size="large"
           onClick={() => {
             window.open(`https://app.0xsplits.xyz/accounts/${splitAddress}`, "_blank");
           }}
           target="_blank"
-        >{`Donate money here!`}</Button>
+        >{`View More Info`}</Button>
       </h3>
     </>
   ) : (
