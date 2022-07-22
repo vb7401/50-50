@@ -56,10 +56,10 @@ const { ethers } = require("ethers");
 */
 
 /// 📡 What chain are your contracts deployed to?
-const initialNetwork = NETWORKS.goerli; // <------- select your target frontend network (localhost, rinkeby, xdai, mainnet)
+const initialNetwork = NETWORKS.mainnet; // <------- select your target frontend network (localhost, rinkeby, xdai, mainnet)
 
 // 😬 Sorry for all the console logging
-const DEBUG = true;
+const DEBUG = false;
 const NETWORKCHECK = true;
 const USE_BURNER_WALLET = true; // toggle burner wallet feature
 const USE_NETWORK_SELECTOR = false;
@@ -249,7 +249,7 @@ function App(props) {
 
   const root = (
     <Switch>
-      <Route exact path="/">
+      <Route exact path="/admin">
         {/*
                 🎛 this scaffolding is full of commonly used components
                 this <Contract/> component will automatically parse your ABI
@@ -348,7 +348,7 @@ function App(props) {
           </div>
         </div>
       </Route>
-      <Route path="/admin">
+      <Route exact path="/">
         <FiftyFiftyAdmin tx={tx} writeContracts={writeContracts} readContracts={readContracts} address={address} />
       </Route>
       <Route default>

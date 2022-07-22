@@ -86,6 +86,7 @@ export default function FiftyFifty({ tx, readContracts, writeContracts, address 
         </a>
       </h3>
       <SplitTable
+        sinkGithubURL={sinkGithubURL}
         splitAddress={splitAddress}
         splitGithubURLs={splitGithubURLs}
         percentAllocations={percentAllocations}
