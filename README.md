@@ -4,4 +4,4 @@
 
 Go to 5050split.xyz or 5050split.netlify.app to learn more!
 
-And fund us (and our dependencies) at https://5050split.netlify.app/vb7401/50-50
+Fund us (and our dependencies) at https://5050split.xyz/vb7401/50-50
