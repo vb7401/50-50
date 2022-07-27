@@ -21,7 +21,7 @@ export default function FiftyFiftyAdmin({ tx, readContracts, writeContracts, add
   }, [deleted]);
 
   const octokit = new Octokit({
-    auth: "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",
+    auth: "",
   });
 
   const homeSection = (
